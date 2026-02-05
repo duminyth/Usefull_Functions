@@ -1,6 +1,6 @@
-# Book of Abstracts Generator (Excel → LaTeX → PDF)
+# Create_BookOfAbstract.py
 
-This project generates a **Book of Abstracts** PDF from an Excel file that contains:
+This python file generates a **Book of Abstracts** PDF from an Excel file that contains:
 - URLs to PDF abstracts (one per row),
 - a session/category (“area”) field used to order abstracts,
 - title + authors information used to build a Table of Contents and an Author Index.
