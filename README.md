@@ -15,8 +15,10 @@ The output is a single **LaTeX `.tex`** file that:
 
 ## Features
 
-- Optional `Intro.pdf` inclusion at the beginning
+- Optional `Book-of-Abstracts_Front-part.pdf` inclusion at the beginning.
+- Optional `Book-of-Book-of-Abstracts_final-page.pdf` inclusion at the end.
 - Works best with **LuaLaTeX** (recommended)
+- Use the font dinish, which has to be download from https://github.com/playbeing/dinish
 
 ---
 
