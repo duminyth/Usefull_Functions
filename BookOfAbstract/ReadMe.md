@@ -33,6 +33,6 @@ The output is a single **LaTeX `.tex`** file that:
 
 #### Features Python
 - Python 3.9+ recommended
-- The 
+- In ``Create_BOA.py`` arguments are dependent of your working environment, i.e., the different paths must be changed, and eventually the variables related to the Excel file if another structure for the Excel file as the one from COMPOSITES 2025 is chosen
 
 ---
