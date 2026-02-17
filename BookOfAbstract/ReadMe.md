@@ -12,17 +12,23 @@ The output is a single **LaTeX `.tex`** file that:
 - generates an **Author Index** with page hyperlinks to each abstract.
 
 ---
+### Excel manuel processing
+- The .py assume that each pdf can be found following an URL or a local path.
+- The "Area" of each Abstract must match a predefined list. Either enforce this matching to the researcher registering, or modify it manually:
+    - Variable `AREA_ORDER` in the .py file. Pay attention that `AREA_ORDER` is a list, the ordering of this list will be the ordering of the abstract in the .tex and .pdf files.
 
-## Features
+---
+### Features Latex
 
 - Optional `Book-of-Abstracts_Front-part.pdf` inclusion at the beginning.
 - Optional `Book-of-Book-of-Abstracts_final-page.pdf` inclusion at the end.
 - Works best with **LuaLaTeX** (recommended)
 - Use the font dinish, which has to be download from https://github.com/playbeing/dinish
+- 
 
 ---
 
-### Python
+#### Python
 - Python 3.9+ recommended
 - Packages:
   - `openpyxl`
