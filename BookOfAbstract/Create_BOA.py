@@ -309,8 +309,7 @@ def build_tex(records: list[dict], out_tex: Path) -> None:
 	parts.append(r"\usepackage{multicol}")
 	parts.append(r"\definecolor{HeaderGreen}{RGB}{0,120,60}")  
 	parts.append(r"\setlength{\headheight}{24pt}")						 
-	# parts.append(r"\setmainfont{Arial Narrow}")
-	parts.append(r"\setmainfont{Arial Narrow}[BoldFont={Arial Narrow Bold}]")
+	parts.append(r"\setmainfont{DINish}")
 	parts.append(r"\keepXColumns")
 	parts.append(r"\usepackage{fancyhdr}")
 	parts.append(r"\pagestyle{fancy}")
@@ -375,7 +374,8 @@ def build_tex(records: list[dict], out_tex: Path) -> None:
 	# ---- AUTHOR INDEX ONCE (outside loop) ----
 	author_index = build_author_index(records)
 	parts.extend(make_author_index_section(author_index))
-
+	
+	parts.append(r"\includepdf[pages=1,scale=1,pagecommand={\thispagestyle{empty}}]{Book-of-Abstracts_final-page.pdf}")
 	parts.append(r"\end{document}")
 
 	out_tex.parent.mkdir(parents=True, exist_ok=True)
