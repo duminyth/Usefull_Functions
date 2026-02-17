@@ -1,3 +1,5 @@
+#%% Libraries
+
 import re
 import requests
 import openpyxl
@@ -7,32 +9,41 @@ import numpy as np
 import shutil
 
 
-XLSX_PATH = Path(r"Z:\ikkv\Dokus_LKKV\040_Projekte\02_Eigenforschung\2025-09-Thomas\Book-of-Abstracts/Abstract_list.xlsx")
-OUT_TEX   = Path(r"Z:\ikkv\Dokus_LKKV\040_Projekte\02_Eigenforschung\2025-09-Thomas\Book-of-Abstracts/BookAbstract.tex")
+#%% Variables
 
+#%%% Directory
 
+# Path to the excel file
+XLSX_PATH 			= Path(r"Z:\ikkv\Dokus_LKKV\040_Projekte\02_Eigenforschung\2025-09-Thomas\Book-of-Abstracts/Abstract_list.xlsx")
 
+# Path where to store the .tex file
+OUT_TEX   			= Path(r"Z:\ikkv\Dokus_LKKV\040_Projekte\02_Eigenforschung\2025-09-Thomas\Book-of-Abstracts/BookAbstract.tex")
+
+# If no PDF is found following the URL, look for the PDF in the following folder
 LOCAL_FALLBACK_DIR = Path(r"C:\Users\p2515497\Documents\WIEN_CONF_2025\LOCAL_PDFS")
+
+
 USE_URL_CELL_AS_LOCAL_FILENAME = True
 
 
-SHEET_NAME = None		  # e.g. "Sheet1" or None for active sheet
+#%%% Excel variables
+SHEET_NAME 		= None		  # e.g. "Sheet1" or None for active sheet
 
-START_ROW = 3
-URL_COL = 3				# column C
-TIMEOUT = 60
+START_ROW 		= 3
+URL_COL 		= 3				# column C
+AREA_COL 		= 9
+TITLE_COL 		= 2
+AUTHOR_COL 		= 10
+TIMEOUT 		= 60
 
-AREA_ORDER  = ["Plenary","Damage Mechanics","Optimization & Dynamic Response", "Delamination & Impact", "Novel Approaches", "Fracture Mechanics","Thin Ply", "Buckling / Stability","Structures","Multi-scale modeling","Novel Materials","Machine Learning I","Machine Learning II"]
+AREA_ORDER  	= ["Plenary","Damage Mechanics","Optimization & Dynamic Response", "Delamination & Impact", "Novel Approaches", "Fracture Mechanics","Thin Ply", "Buckling / Stability","Structures","Multi-scale modeling","Novel Materials","Machine Learning I","Machine Learning II"]
 
-SCALE = 0.95
 
-AREA_COL = 9
+#%%% Tex variable
 
-TITLE_COL = 2
-AUTHOR_COL = 10
-	
-	
-# ------------------------- SETTINGS (EDIT THESE) -------------------------
+# scaling each pdf, must be <1 to insert correctly a header and a page numbering in the tex file
+SCALE 			= 0.95
+
 _LATEX_SPECIALS = {
 		"\\": r"\textbackslash{}",
 		"&": r"\&",
@@ -152,7 +163,6 @@ def find_local_pdf(rec: dict, idx: int, url_cell_text: str = "") -> Path | None:
 
 	candidates = []
 
-	# 1) Dateiname aus der URL-Zelle verwenden (falls gewünscht)
 	if USE_URL_CELL_AS_LOCAL_FILENAME:
 			txt = (url_cell_text or "").strip()
 			if txt and (txt.lower().endswith(".pdf") or "." in txt) and ("http://" not in txt and "https://" not in txt):
@@ -278,114 +288,6 @@ def download_pdf(url: str, out_path: Path, timeout: int = TIMEOUT) -> None:
 					f.write(chunk)
 	return
 
-
-
-
-
-#%% Latex related functions 
-
-# def build_tex(records: list[dict], out_tex: Path) -> None:
-# 	"""
-# 	records list items contain:
-# 	- area, title, main_author, pdf_path, id
-# 	Already filtered to AREA_ORDER and ordered by AREA_ORDER then Excel row order.
-# 	"""
-# 	parts = []
-# 	parts.append(r"\documentclass[11pt]{article}")
-# 	parts.append(r"\usepackage[a4paper,margin=1.5cm]{geometry}")
-# 	parts.append(r"\usepackage{pdfpages}")
-# 	parts.append(r"\usepackage{hyperref}")
-# 	parts.append(r"\hypersetup{hidelinks}")
-# 	parts.append(r"\usepackage{tabularx}")
-# 	parts.append(r"\usepackage{ltablex}")
-# 	parts.append(r"\usepackage{longtable}")
-# 	parts.append(r"\usepackage{array}")
-# 	parts.append(r"\usepackage{fontspec}")
-# 	parts.append(r"\usepackage{xcolor}")
-# 	parts.append(r"\definecolor{HeaderGreen}{RGB}{0,120,60}")  
-# 	parts.append(r"\setlength{\headheight}{24pt}")						 
-# 	parts.append(r"\setmainfont{Arial Narrow}")
-# 	parts.append(r"\keepXColumns")
-# 	parts.append(r"\usepackage{fancyhdr}")
-# 	parts.append(r"\pagestyle{fancy}")
-# 	parts.append(r"\fancyhf{}")
-# 	parts.append(r"\fancyhead{}")
-# 	parts.append(
-# 		r"\fancyhead[C]{"
-# 		r"\colorbox{HeaderGreen}{"
-# 		r"\parbox{\textwidth}{\centering\color{white}\large COMPOSITE 2025 - Vienna - Book of abstracts}"
-# 		r"}"
-# 		r"}"
-# 	)
-# 	parts.append(r"\renewcommand{\headrulewidth}{0pt}")  # Linie aus, weil der Balken die „Linie“ ist
-# 	parts.append(r"\renewcommand{\headrulewidth}{0.4pt}")
-# 	parts.append(r"\fancyfoot[C]{\thepage}")
-# 	parts.append(r"\renewcommand{\headrulewidth}{0pt}")
-# 	parts.append(r"\newcommand{\CurrentPDFTarget}{}")
-# 	parts.append(r"\newcommand{\CurrentPDFLabel}{}")
-
-
-# 	parts.append(r"\begin{document}")
-# 	parts.append(r"\includepdf[pages=1-4,scale=1,pagecommand={\thispagestyle{empty}}]{Intro.pdf}")
-
-
-# 	# Custom “TOC” before everything
-# 	parts.extend(make_custom_toc(records))
-
-# 	current_area = None
-
-# 	for rec in records:
-# 		area = rec["area"]
-# 		if area != current_area:
-# 			current_area = area
-# 			parts.extend(make_transition_page(area))
-
-# 		pdf_path = rec["pdf_path"]
-# 		target_id = rec["id"]
-# 		latex_path = str(pdf_path).replace("\\", "/")
-
-# 		# Set a one-shot target name; pagecommand will place it on the FIRST included page and then clear it
-# 		parts.append(r"\gdef\CurrentPDFTarget{%s}" % target_id)
-
-
-# 		target_id = rec["id"]						  # e.g. abs:0001
-# 		label_id  = rec["label"]				   # e.g. lab:0001
-# 		
-# 		parts.append(r"\gdef\CurrentPDFTarget{%s}" % rec["id"])
-# 		parts.append(r"\gdef\CurrentPDFLabel{%s}" % rec["label"])
-# 		if SCALE != 1.0:
-# 			parts.append(
-# 				r"\includepdf[pages=-,scale=%s,pagecommand={\thispagestyle{fancy}"
-# 				r"\ifx\CurrentPDFTarget\empty\else"
-# 				r"\phantomsection"
-# 				r"\hypertarget{\CurrentPDFTarget}{}"
-# 				r"\label{\CurrentPDFLabel}"
-# 				r"\gdef\CurrentPDFTarget{}\gdef\CurrentPDFLabel{}"
-# 				r"\fi}]{%s}" % (SCALE, latex_path)
-# 			)
-# 		else:
-# 			parts.append(
-# 				r"\includepdf[pages=-,pagecommand={\thispagestyle{fancy}"
-# 				r"\ifx\CurrentPDFTarget\empty\else"
-# 				r"\phantomsection"
-# 				r"\hypertarget{\CurrentPDFTarget}{}"
-# 				r"\label{\CurrentPDFLabel}"
-# 				r"\gdef\CurrentPDFTarget{}\gdef\CurrentPDFLabel{}"
-# 				r"\fi}]{%s}" % latex_path
-# 			)
-# 	
-# 	
-# 	author_index = build_author_index(records)
-# 	parts.extend(make_author_index_section(author_index))
-# 	
-# 	
-# 	parts.append(r"\end{document}")
-
-# 	out_tex.parent.mkdir(parents=True, exist_ok=True)
-# 	out_tex.write_text("\n".join(parts), encoding="utf-8")
-# 	print(f"Wrote LaTeX file: {out_tex}")
-
-# 	return
 
 
 
@@ -734,12 +636,7 @@ def main() -> None:
 	pdf_dir = Path(r"Z:\ikkv\Dokus_LKKV\040_Projekte\02_Eigenforschung\2025-09-Thomas\Book-of-Abstracts\downloaded_pdfs")
 	per_area: dict[str, list[dict]] = {a: [] for a in AREA_ORDER}
 
-	# 1) READ EXCEL ONCE
 	for row in range(START_ROW, ws.max_row + 1):
-# 		url = get_cell_url(ws.cell(row=row, column=URL_COL))
-# 		if not url:
-# 			continue
-		
 		
 		url_cell = ws.cell(row=row, column=URL_COL)
 		url = get_cell_url(url_cell)
@@ -754,26 +651,18 @@ def main() -> None:
 		main_author = parse_main_author(authors_cell)
 		authors_list = parse_all_authors(authors_cell)
 
-# 		per_area[area].append({
-# 			"row": row,
-# 			"area": area,
-# 			"title": title if title else "(No title)",
-# 			"main_author": main_author,
-# 			"authors": authors_list,
-# 			"url": url,		})
-		
+
 		per_area[area].append({
 			"row": row,
 			"area": area,
 			"title": title if title else "(No title)",
 			"main_author": main_author,
 			"authors": authors_list,
-			"url": url,			  # kann None sein
-			"url_text": url_text,	# <--- NEU
+			"url": url,			  
+			"url_text": url_text,	
 			})
 
 
-	# 2) DOWNLOAD EACH PDF ONCE (IN AREA_ORDER)
 	records: list[dict] = []
 	idx = 0
 	
@@ -820,7 +709,6 @@ def main() -> None:
 				print(f"ERROR row {rec['row']} area={area} url={rec.get('url','')} reason={e}")
 
 
-	# 3) BUILD TEX ONCE
 	if not records:
 		raise RuntimeError("No valid PDFs downloaded for the requested AREA_ORDER list.")
 
@@ -832,5 +720,7 @@ def main() -> None:
 	print(f"  lualatex {out_tex.name}")
 
 
+
+#%% Main
 if __name__ == "__main__":
 	main()
