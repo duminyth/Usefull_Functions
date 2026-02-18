@@ -332,7 +332,8 @@ def build_tex(records: list[dict], out_tex: Path) -> None:
 
 	parts.append(r"\begin{document}")
 	parts.append(r"\includepdf[pages=1-4,scale=1,pagecommand={\thispagestyle{empty}}]{Book-of-Abstracts_Front-part.pdf}")
-
+	parts.append(r"\pagenumbering{arabic}")
+	parts.append(r"\setcounter{page}{1}")
 	parts.extend(make_custom_toc(records))
 
 	current_area = None
